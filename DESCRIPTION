@@ -6,12 +6,25 @@ Authors@R: c(
     person(
       "Roman", "Kyrychenko",
       email = "roman.kyrychenko@helsinki.fi",
-      role = c("aut", "cre")
+      role = c("aut", "cre"),
+      comment = c(ORCID = "0000-0002-1610-4352"),
     )
   )
 Description: This package provides functions to efficiently save ggplot2 plots in LaTeX TikZ format.
     It includes utilities to optimize the resulting .tex files by rounding coordinates,
     removing duplicated elements, and reducing the file size.
-License: MIT
+URL: https://github.com/RomanKyrychenko/ggplot2latex
+BugReports: https://github.com/RomanKyrychenko/ggplot2latex/issues
+License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
+Suggests: 
+    ggplot2,
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
+Imports: 
+    dplyr,
+    readr,
+    stringr,
+    tikzDevice
+RoxygenNote: 7.3.2
