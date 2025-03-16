@@ -2,9 +2,6 @@
 
 <!-- badges: start -->
 [![Codecov test coverage](https://codecov.io/gh/RomanKyrychenko/ggplot2latex/branch/main/graph/badge.svg)](https://app.codecov.io/gh/RomanKyrychenko/ggplot2latex?branch=main)
-<!-- badges: end -->
-
-<!-- badges: start -->
 [![R-CMD-check](https://github.com/RomanKyrychenko/ggplot2latex/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/RomanKyrychenko/ggplot2latex/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
