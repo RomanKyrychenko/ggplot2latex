@@ -24,12 +24,7 @@ optimize_tex <- function(file, reduce_power = 0) {
       lines <- lines[-to_remove]
     }
   }
-  
-  #txt <- paste(lines, collapse = ";")
-  
-  #writeLines(txt, con = file)
-  
-  #lines <- readLines(con = file)
+
   lines <- lines[-which(grepl("\\path\\[clip\\]*", lines, perl = F))]
   lines <- lines[-which(grepl("\\path\\[use as bounding box*", lines, perl = F))]
   
@@ -40,7 +35,7 @@ optimize_tex <- function(file, reduce_power = 0) {
       lines <- lines[-to_remove]
     }
   }
-  # remove duplicated \definecolor lines (keep only first)
+
   lines <- lines[lines != ""]
   lines <- lines[c(TRUE, lines[-1] != lines[-length(lines)])]
   if (reduce_power != 0) {
