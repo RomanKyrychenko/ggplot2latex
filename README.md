@@ -1,5 +1,13 @@
 # ggplot2latex
 
+<!-- badges: start -->
+[![Codecov test coverage](https://codecov.io/gh/RomanKyrychenko/ggplot2latex/branch/main/graph/badge.svg)](https://app.codecov.io/gh/RomanKyrychenko/ggplot2latex?branch=main)
+<!-- badges: end -->
+
+<!-- badges: start -->
+[![R-CMD-check](https://github.com/RomanKyrychenko/ggplot2latex/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/RomanKyrychenko/ggplot2latex/actions/workflows/R-CMD-check.yaml)
+<!-- badges: end -->
+
 `ggplot2latex` is an R package designed to efficiently save `ggplot2` plots in LaTeX TikZ format. The package provides functions to optimize the resulting `.tex` files by rounding coordinates, removing duplicated elements, and reducing the file size. This ensures that the LaTeX documents are both lightweight and maintain high-quality visualizations.
 
 ## Features
