@@ -4,14 +4,14 @@
 \alias{save_tex}
 \title{Save ggplot2 Plot as LaTeX (TikZ)}
 \usage{
-save_tex(g, file, width = 5.5, height = 4.5, reduce_power = 0)
+save_tex(g, file, width = 6.9, height = 4.5, reduce_power = 0)
 }
 \arguments{
 \item{g}{A ggplot2 object to be saved.}
 
 \item{file}{The path to the output .tex file.}
 
-\item{width}{The width of the plot in inches. Default is 5.5.}
+\item{width}{The width of the plot in inches. Default is 6.9.}
 
 \item{height}{The height of the plot in inches. Default is 4.5.}
 
