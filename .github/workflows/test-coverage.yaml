@@ -29,9 +29,9 @@ jobs:
                                   texlive-latex-extra texlive-xetex texlive-science texlive-pictures \
                                   texlive-luatex lmodern
 
-      - name: Install TinyTeX
+      - name: Install TinyTeX (force install)
         run: |
-          Rscript -e 'install.packages("tinytex"); tinytex::install_tinytex()'
+          Rscript -e 'install.packages("tinytex"); tinytex::install_tinytex(force = TRUE)'
 
       - name: Install TikZ (pgf package)
         run: |
