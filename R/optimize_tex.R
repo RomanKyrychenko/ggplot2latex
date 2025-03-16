@@ -9,14 +9,14 @@
 #' }
 #' @export
 optimize_tex <- function(file, reduce_power = 0) {
-  txt <- readr::read_file(file)
+  txt <- readLines(file, warn = FALSE)
   
-  txt <- stringr::str_replace_all(txt, "\n\r", "")
-  txt <- stringr::str_replace_all(txt, "\n\n", "\n")
+  txt <- gsub("\n\r", "", txt)
+  txt <- gsub("\n\n", "\n", txt)
   
   txt <- round_floats_in_text(txt)
   
-  lines <- stringr::str_split_1(string = txt, pattern = ";")
+  lines <- unlist(strsplit(txt, "(?<=;)", perl = TRUE))
   ulines <- unique(lines)
   for (ul in ulines) {
     to_remove <- which(lines == ul)[-1]
@@ -25,11 +25,11 @@ optimize_tex <- function(file, reduce_power = 0) {
     }
   }
   
-  txt <- paste(lines, collapse = ";")
+  #txt <- paste(lines, collapse = ";")
   
-  readr::write_file(txt, file)
+  #writeLines(txt, con = file)
   
-  lines <- readLines(con = file)
+  #lines <- readLines(con = file)
   lines <- lines[-which(grepl("\\path\\[clip\\]*", lines, perl = F))]
   lines <- lines[-which(grepl("\\path\\[use as bounding box*", lines, perl = F))]
   
@@ -42,7 +42,7 @@ optimize_tex <- function(file, reduce_power = 0) {
   }
   # remove duplicated \definecolor lines (keep only first)
   lines <- lines[lines != ""]
-  lines <- lines[lines != dplyr::lag(lines, 1)]
+  lines <- lines[c(TRUE, lines[-1] != lines[-length(lines)])]
   if (reduce_power != 0) {
     if (reduce_power < 1) {
       reduce_power <- ceiling(1 / reduce_power)
