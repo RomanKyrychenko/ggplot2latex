@@ -33,11 +33,13 @@ jobs:
         run: |
           Rscript -e 'install.packages("tinytex"); tinytex::install_tinytex(force = TRUE)'
 
-
       - name: Install TikZ (pgf package)
         run: |
           Rscript -e 'tinytex::tlmgr_install("pgf")'
-
+      
+      - name: Install tikzDevice
+        run: |
+          Rscript -e 'install.packages("tikzDevice")'
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
           extra-packages: any::rcmdcheck
