@@ -154,7 +154,7 @@ test_that("save_tex saves a plot with different point size", {
 test_that("save_tex saves a plot with different line size", {
   require(ggplot2)
   p <- ggplot(mtcars, aes(x = wt, y = mpg)) +
-    geom_line(size = 1)
+    geom_path(linewidth = 1)
   file <- tempfile(fileext = ".tex")
   save_tex(p, file)
   expect_true(file.exists(file))
@@ -238,5 +238,89 @@ test_that("save_tex saves a plot with different size and higher reduce_power", {
   file <- tempfile(fileext = ".tex")
   save_tex(p, file, reduce_power = 3)
   expect_true(file.exists(file))
+  unlink(file)
+})
+
+test_that("save_tex works with as_file = TRUE", {
+  require(ggplot2)
+  p <- ggplot(mtcars, aes(x = wt, y = mpg)) +
+    geom_point()
+  file <- tempfile(fileext = ".tex")
+  save_tex(p, file, as_file = TRUE)
+
+  # Check file exists
+  expect_true(file.exists(file))
+
+  # Check content contains standalone document elements
+  content <- readLines(file)
+  expect_true(any(grepl("\\\\documentclass", content)))
+  expect_true(any(grepl("\\\\begin\\{document\\}", content)))
+  expect_true(any(grepl("\\\\end\\{document\\}", content)))
+
+  unlink(file)
+})
+
+test_that("save_tex works with different width and height", {
+  require(ggplot2)
+  p <- ggplot(mtcars, aes(x = wt, y = mpg)) +
+    geom_point()
+  file <- tempfile(fileext = ".tex")
+  # Use non-default dimensions
+  save_tex(p, file, width = 10, height = 8)
+  expect_true(file.exists(file))
+  unlink(file)
+})
+
+test_that("save_tex works with fractional reduce_power", {
+  require(ggplot2)
+  p <- ggplot(mtcars, aes(x = wt, y = mpg)) +
+    geom_point()
+  file <- tempfile(fileext = ".tex")
+  save_tex(p, file, reduce_power = 0.5)
+  expect_true(file.exists(file))
+  unlink(file)
+})
+
+test_that("save_tex handles plot with multiple geoms", {
+  require(ggplot2)
+  p <- ggplot(mtcars, aes(x = wt, y = mpg)) +
+    geom_point() +
+    geom_line() +
+    geom_smooth(method = "lm")
+  file <- tempfile(fileext = ".tex")
+  save_tex(p, file)
+  expect_true(file.exists(file))
+  unlink(file)
+})
+
+test_that("save_tex handles plot with complex annotations", {
+  require(ggplot2)
+  p <- ggplot(mtcars, aes(x = wt, y = mpg)) +
+    geom_point() +
+    annotate("text", x = 4, y = 30, label = "Special point") +
+    annotate("rect", xmin = 3, xmax = 5, ymin = 15, ymax = 25,
+             alpha = 0.2, fill = "blue")
+  file <- tempfile(fileext = ".tex")
+  save_tex(p, file)
+  expect_true(file.exists(file))
+  unlink(file)
+})
+
+test_that("save_tex preserves the essential plot structure", {
+  require(ggplot2)
+  p <- ggplot(mtcars, aes(x = wt, y = mpg)) +
+    geom_point()
+  file <- tempfile(fileext = ".tex")
+  save_tex(p, file)
+
+  content <- readLines(file)
+
+  # Check that tikzpicture environment exists
+  expect_true(any(grepl("\\\\begin\\{tikzpicture\\}", content)))
+  expect_true(any(grepl("\\\\end\\{tikzpicture\\}", content)))
+
+  # Check that path commands exist (common in tikz output)
+  expect_true(any(grepl("\\\\path", content)))
+
   unlink(file)
 })
