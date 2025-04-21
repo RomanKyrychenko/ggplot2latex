@@ -4,12 +4,14 @@
 \alias{optimize_tex}
 \title{Optimize TeX File}
 \usage{
-optimize_tex(file, reduce_power = 0)
+optimize_tex(file, reduce_power = 0, as_file = FALSE)
 }
 \arguments{
 \item{file}{A character string specifying the file path to be optimized.}
 
 \item{reduce_power}{A parameter to control the reduction of the file size. Default is 0.}
+
+\item{as_file}{A logical value indicating whether to save the plot as a standalone TeX file. Default is FALSE.}
 }
 \value{
 None. The function is called for its side effects.

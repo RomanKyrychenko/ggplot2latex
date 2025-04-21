@@ -2,13 +2,14 @@
 #' @description Optimizes a TeX file by removing unnecessary lines and rounding floats.
 #' @param file A character string specifying the file path to be optimized.
 #' @param reduce_power A parameter to control the reduction of the file size. Default is 0.
+#' @param as_file A logical value indicating whether to save the plot as a standalone TeX file. Default is FALSE.
 #' @return None. The function is called for its side effects.
 #' @examples
 #' \dontrun{
 #' optimize_tex("path/to/your/file.tex")
 #' }
 #' @export
-optimize_tex <- function(file, reduce_power = 0) {
+optimize_tex <- function(file, reduce_power = 0, as_file = FALSE) {
   txt <- readLines(file, warn = FALSE)
   
   txt <- gsub("\n\r", "", txt)
@@ -48,6 +49,9 @@ optimize_tex <- function(file, reduce_power = 0) {
     rnd <- as.logical(1 - grepl("\\path\\[.*\\] \\(.*\\) circle \\(.*\\);", lines, perl = F) * flt) & as.logical(1 - grepl("\\t\\(.*\\) --", lines, perl = F) * flt)
     lines <- lines[rnd]
   }
-  lines <- lines[which(lines == "\\begin{tikzpicture}[x=1pt,y=1pt]"):which(lines == "\\end{tikzpicture}")]
+
+  if (!as_file) {
+    lines <- lines[which(lines == "\\begin{tikzpicture}[x=1pt,y=1pt]"):which(lines == "\\end{tikzpicture}")]
+  }
   writeLines(lines, con = file)
 }
