@@ -25,6 +25,6 @@ Saves a ggplot object as a TikZ/TeX file without optimization.
 \dontrun{
 library(ggplot2)
 p <- ggplot(mtcars, aes(x = wt, y = mpg)) + geom_point()
-save_ikz(p, "plot.tex")
+save_tikz(p, "plot.tex")
 }
 }

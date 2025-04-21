@@ -9,7 +9,7 @@
 #' \dontrun{
 #' library(ggplot2)
 #' p <- ggplot(mtcars, aes(x = wt, y = mpg)) + geom_point()
-#' save_ikz(p, "plot.tex")
+#' save_tikz(p, "plot.tex")
 #' }
 #' @export
 save_tikz <- function(g, file, width = 6.9, height = 4.5) {
