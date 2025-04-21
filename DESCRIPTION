@@ -22,6 +22,8 @@ Suggests:
     covr,
     ggplot2,
     pdftools,
+    igraph,
+    ggraph,
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
 Imports: 
