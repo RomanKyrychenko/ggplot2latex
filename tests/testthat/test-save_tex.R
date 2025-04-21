@@ -284,9 +284,17 @@ test_that("save_tex works with fractional reduce_power", {
 test_that("save_tex handles plot with multiple geoms", {
   require(ggplot2)
   p <- ggplot(mtcars, aes(x = wt, y = mpg)) +
-    geom_point() +
-    geom_line() +
-    geom_smooth(method = "lm")
+    geom_point(aes(color = factor(cyl), size = hp), alpha = 0.7) +
+    geom_line(aes(group = factor(cyl), color = factor(cyl)), linetype = "dashed") +
+    geom_smooth(method = "lm", se = TRUE, color = "red", fill = "pink", alpha = 0.3) +
+    scale_color_brewer(name = "Cylinders", palette = "Set1") +
+    scale_size_continuous(name = "Horsepower", range = c(1, 4)) +
+    annotate("rect", xmin = 3, xmax = 4, ymin = 10, ymax = 15,
+             alpha = 0.1, fill = "blue", color = "navy", linetype = "dotted") +
+    labs(title = "Car Weight vs. Fuel Efficiency",
+         subtitle = "Grouped by number of cylinders",
+         x = "Weight (1000 lbs)",
+         y = "Miles per Gallon")
   file <- tempfile(fileext = ".tex")
   save_tex(p, file)
   expect_true(file.exists(file))
@@ -296,10 +304,18 @@ test_that("save_tex handles plot with multiple geoms", {
 test_that("save_tex handles plot with complex annotations", {
   require(ggplot2)
   p <- ggplot(mtcars, aes(x = wt, y = mpg)) +
-    geom_point() +
-    annotate("text", x = 4, y = 30, label = "Special point") +
+    geom_point(aes(size = hp, shape = factor(am)), alpha = 0.8) +
+    geom_smooth(method = "loess", se = TRUE, color = "tomato", fill = "pink", alpha = 0.3) +
+    annotate("text", x = 4, y = 30, label = "Special point",
+             fontface = "italic", size = 5, color = "purple") +
     annotate("rect", xmin = 3, xmax = 5, ymin = 15, ymax = 25,
-             alpha = 0.2, fill = "blue")
+             alpha = 0.2, fill = "blue", color = "darkblue", linetype = "dashed") +
+    annotate("segment", x = 3.5, xend = 4, y = 20, yend = 30,
+             arrow = arrow(length = unit(0.2, "cm")), color = "red", linewidth = 1) +
+    annotate("curve", x = 2, y = 27, xend = 2.5, yend = 33,
+             curvature = -0.3, arrow = arrow(length = unit(0.2, "cm")), color = "orange") +
+    scale_size_continuous(range = c(1, 6)) +
+    scale_shape_manual(values = c(16, 17))
   file <- tempfile(fileext = ".tex")
   save_tex(p, file)
   expect_true(file.exists(file))
@@ -308,8 +324,17 @@ test_that("save_tex handles plot with complex annotations", {
 
 test_that("save_tex preserves the essential plot structure", {
   require(ggplot2)
-  p <- ggplot(mtcars, aes(x = wt, y = mpg)) +
-    geom_point()
+  p <- ggplot(mtcars, aes(x = wt, y = mpg, color = factor(cyl), size = hp, group = cyl)) +
+    geom_point(alpha = 0.7, shape = 16) +
+    geom_smooth(method = "lm", se = TRUE, linetype = "dashed") +
+    scale_color_viridis_d(name = "Cylinders") +
+    scale_size_continuous(name = "Horsepower", range = c(1, 5)) +
+    labs(title = "Car Weight vs. Fuel Efficiency",
+         subtitle = "By cylinder count and horsepower",
+         x = "Weight (1000 lbs)",
+         y = "Miles per Gallon") +
+    theme_minimal() +
+    facet_wrap(~am, labeller = labeller(am = c("0" = "Automatic", "1" = "Manual")))
   file <- tempfile(fileext = ".tex")
   save_tex(p, file)
 
@@ -323,4 +348,224 @@ test_that("save_tex preserves the essential plot structure", {
   expect_true(any(grepl("\\\\path", content)))
 
   unlink(file)
+})
+
+test_that("save_tex works with igraph plots", {
+  skip_if_not_installed("igraph")
+  skip_if_not_installed("ggraph")
+  require(ggplot2)
+  require(igraph)
+  require(ggraph)
+
+  # Create a simple graph
+  g <- make_ring(10)
+
+  # Create plot with ggraph
+  p <- ggraph(g, layout = "circle") +
+    geom_edge_link() +
+    geom_node_point(linewidth = 5) +
+    theme_graph()
+
+  file <- tempfile(fileext = ".tex")
+  save_tex(p, file)
+  expect_true(file.exists(file))
+  unlink(file)
+})
+
+test_that("save_tex works with complex network graphs", {
+  skip_if_not_installed("igraph")
+  skip_if_not_installed("ggraph")
+  require(igraph)
+  require(ggraph)
+
+  # Create a more complex graph
+  g <- sample_pa(30, power = 1, directed = FALSE)
+  V(g)$size <- degree(g) * 0.5 + 2
+
+  # Create plot with node colors, edge weights and custom layout
+  p <- ggraph(g, layout = "kk") +
+    geom_edge_link(aes(width = seq_len(ecount(g))/ecount(g)),
+                  alpha = 0.7, color = "gray50") +
+    geom_node_point(aes(size = size, color = size)) +
+    scale_color_viridis_c() +
+    scale_edge_width(range = c(0.2, 1.5)) +
+    labs(title = "Preferential Attachment Network") +
+    theme_graph()
+
+  file <- tempfile(fileext = ".tex")
+  save_tex(p, file)
+  expect_true(file.exists(file))
+  unlink(file)
+})
+
+test_that("save_tex works with network graphs with node labels", {
+  skip_if_not_installed("igraph")
+  skip_if_not_installed("ggraph")
+  require(igraph)
+  require(ggraph)
+
+  # Create a graph with named vertices
+  g <- make_graph("Zachary")
+  V(g)$name <- paste0("Node ", 1:vcount(g))
+
+  # Create plot with node labels
+  p <- ggraph(g, layout = "fr") +
+    geom_edge_link(alpha = 0.3) +
+    geom_node_point(color = "steelblue") +
+    geom_node_text(aes(label = name), repel = TRUE, size = 3) +
+    theme_graph()
+
+  file <- tempfile(fileext = ".tex")
+  save_tex(p, file)
+  expect_true(file.exists(file))
+  unlink(file)
+})
+
+test_that("save_tex works with network community detection visualization", {
+  skip_if_not_installed("igraph")
+  skip_if_not_installed("ggraph")
+  require(igraph)
+  require(ggraph)
+
+  # Create a graph with communities
+  g <- sample_pa(40, power = 1, directed = FALSE)
+  communities <- cluster_louvain(g)
+  V(g)$community <- membership(communities)
+
+  # Create plot with community colors
+  p <- ggraph(g, layout = "fr") +
+    geom_edge_link(alpha = 0.5) +
+    geom_node_point(aes(color = factor(community)), size = 4) +
+    scale_color_brewer(name = "Community", palette = "Set1") +
+    theme_graph() +
+    ggtitle("Network Communities")
+
+  file <- tempfile(fileext = ".tex")
+  save_tex(p, file)
+  expect_true(file.exists(file))
+  unlink(file)
+})
+
+test_that("save_tex works with hierarchical edge bundling", {
+  skip_if_not_installed("igraph")
+  skip_if_not_installed("ggraph")
+  require(igraph)
+  require(ggraph)
+
+  # Create hierarchical graph
+  g <- make_tree(20, 2, mode = "out")
+
+  # Create plot with edge bundling
+  p <- ggraph(g, layout = "dendrogram") +
+    geom_edge_diagonal(aes(alpha = after_stat(index)), color = "steelblue") +
+    geom_node_point(color = "red") +
+    theme_graph() +
+    ggtitle("Hierarchical Edge Bundling")
+
+  file <- tempfile(fileext = ".tex")
+  save_tex(p, file)
+  expect_true(file.exists(file))
+  unlink(file)
+})
+
+test_that("save_tex works with network layouts with high reduce_power", {
+  skip_if_not_installed("igraph")
+  skip_if_not_installed("ggraph")
+  require(igraph)
+  require(ggraph)
+
+  # Create a complete graph
+  g <- make_full_graph(8)
+
+  # Create plot
+  p <- ggraph(g, layout = "circle") +
+    geom_edge_link(linewidth = 1, color = "grey70") +
+    geom_node_point(size = 8, color = "steelblue") +
+    geom_node_text(aes(label = 1:vcount(g)), color = "white") +
+    theme_graph()
+
+  file <- tempfile(fileext = ".tex")
+  save_tex(p, file, reduce_power = 3)
+  expect_true(file.exists(file))
+  unlink(file)
+})
+
+test_that("save_tex produces smaller files than save_tikz", {
+  # Skip if tikzDevice is not installed
+  skip_if_not_installed("tikzDevice")
+  require(ggplot2)
+
+  # Create a simple plot
+  p <- ggplot(mtcars, aes(x = wt, y = mpg, color = factor(cyl))) +
+    geom_point() +
+    labs(title = "Weight vs Fuel Efficiency", color = "Cylinders") +
+    theme_minimal()
+
+  # Save using both methods
+  tikz_file <- tempfile(fileext = ".tex")
+  tex_file <- tempfile(fileext = ".tex")
+
+  save_tikz(p, tikz_file)
+  save_tex(p, tex_file)
+
+  # Compare file sizes
+  tikz_size <- file.size(tikz_file)
+  tex_size <- file.size(tex_file)
+
+  # Test that optimized file is smaller
+  expect_lt(tex_size, tikz_size)
+
+  # Test with different reduction powers
+  tex_file_high <- tempfile(fileext = ".tex")
+  save_tex(p, tex_file_high, reduce_power = 2)
+  tex_size_high <- file.size(tex_file_high)
+
+  # Higher reduce_power should produce even smaller files
+  expect_lt(tex_size_high, tex_size)
+
+  # Cleanup
+  unlink(c(tikz_file, tex_file, tex_file_high))
+})
+
+test_that("save_tex reduces file size for complex plots", {
+  require(ggplot2)
+
+  # Create a more complex plot with many elements
+  p <- ggplot(diamonds[1:1000,], aes(x = carat, y = price, color = cut)) +
+    geom_point(alpha = 0.7) +
+    geom_smooth(method = "lm") +
+    facet_wrap(~clarity) +
+    scale_color_brewer(palette = "Set1") +
+    theme_minimal() +
+    labs(title = "Diamond Price by Carat and Cut",
+         subtitle = "Grouped by clarity",
+         x = "Carat (weight)",
+         y = "Price (USD)")
+
+  # Save using both methods
+  tikz_file <- tempfile(fileext = ".tex")
+  tex_file <- tempfile(fileext = ".tex")
+
+  save_tikz(p, tikz_file)
+  save_tex(p, tex_file)
+
+  # Compare file sizes
+  tikz_size <- file.size(tikz_file)
+  tex_size <- file.size(tex_file)
+
+  # Test that optimized file is smaller
+  expect_lt(tex_size, tikz_size)
+
+  # Calculate reduction percentage
+  reduction_percent <- (1 - tex_size/tikz_size) * 100
+
+  # Print size reduction info for debugging
+  message(sprintf("Original size: %d bytes, Optimized size: %d bytes, Reduction: %.1f%%",
+                  tikz_size, tex_size, reduction_percent))
+
+  # Expect at least 10% reduction
+  expect_gt(reduction_percent, 10)
+
+  # Cleanup
+  unlink(c(tikz_file, tex_file))
 })
