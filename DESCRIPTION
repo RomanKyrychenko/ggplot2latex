@@ -21,6 +21,7 @@ LazyData: true
 Suggests: 
     covr,
     ggplot2,
+    pdftools,
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
 Imports: 
