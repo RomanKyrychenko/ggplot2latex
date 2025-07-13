@@ -26,8 +26,11 @@ predefined_colors <- c(
 optimize_colors <- function(lines) {
   
   # Identify document structure
-  preamble_end <- which(grepl("\\\\begin\\{document\\}", lines))
-  
+  preamble_end <- which(grepl("\\\\begin\\{tikzpicture\\}\\[x=1pt,y=1pt\\]", lines))
+  # if there is no preamble (integer(0)), assume the first line is the start of the document
+  if (length(preamble_end) == 0) {
+    preamble_end <- 1
+  } 
   # First pass: identify and extract all color definitions
   color_pattern <- "\\\\definecolor\\{([^}]+)\\}\\{([^}]+)\\}\\{([^}]+)\\}"
   
@@ -60,7 +63,7 @@ optimize_colors <- function(lines) {
   # construct new color definitions
   color_definitions$new_color_definition <- ifelse(
     color_definitions$is_rgb,
-    paste0("\\definecolor{", color_definitions$new_color_name, "}{rgb}{", color_definitions$color_values, "}"),
+    paste0("\\definecolor{", color_definitions$new_color_name, "}{RGB}{", color_definitions$color_values, "}"),
     paste0("\\definecolor{", color_definitions$new_color_name, "}{gray}{", color_definitions$color_values, "}")
   )
   
@@ -111,12 +114,12 @@ optimize_tex <- function(file, reduce_power = 0, as_file = FALSE) {
   
   lines <- unlist(strsplit(txt, "(?<=;)", perl = TRUE))
   ulines <- unique(lines)
-  for (ul in ulines) {
-    to_remove <- which(lines == ul)[-1]
-    if (length(to_remove) > 0) {
-      lines <- lines[-to_remove]
-    }
-  }
+  #for (ul in ulines) {
+  #  to_remove <- which(lines == ul)[-1]
+  #  if (length(to_remove) > 0) {
+  #    lines <- lines[-to_remove]
+  #  }
+  #}
 
   lines <- lines[-which(grepl("\\path\\[clip\\]*", lines, perl = F))]
   lines <- lines[-which(grepl("\\path\\[use as bounding box*", lines, perl = F))]

@@ -28,5 +28,6 @@ Suggests:
 Config/testthat/edition: 3
 Imports: 
     tikzDevice,
-    tinytex
+    tinytex,
+    stringr
 RoxygenNote: 7.3.2
