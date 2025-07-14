@@ -38,10 +38,10 @@ test_that("resize_tex scales coordinates correctly", {
   
   resize_tex(temp_file, width = 20, height = 14, output_path = output_file)
   output_content <- readLines(output_file)
-  
+
   expect_true(any(grepl("\\(0.0000,0.0000\\)", output_content)))
-  expect_true(any(grepl("\\(10.0000,6.0000\\)", output_content)))
-  expect_true(any(grepl("\\(20.0000,14.0000\\)", output_content)))
+  expect_true(any(grepl("\\(720.0000,432.0000\\)", output_content)))
+  expect_true(any(grepl("\\(1440.0000,1008.0000\\)", output_content)))
   unlink(temp_file)
   unlink(output_file)
 })
